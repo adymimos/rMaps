@@ -40,16 +40,29 @@ processChoroData <- function(x, data, pal, map = 'usa', ...){
 #' 
 #' 
 #' 
-ichoropleth <- function(x, data, pal = "Blues", ncuts = 5, animate = NULL, play = F, map = 'usa', legend = TRUE, labels = TRUE, ...){
+ichoropleth <- function(x, data, pal = "Blues", ncuts = 5, eff=FALSE, animate = NULL, play = F, map = 'usa', legend = TRUE, labels = TRUE, ...){
   d <- Datamaps$new()
   fml = lattice::latticeParseFormula(x, data = data)
-  data = transform(data, 
-    fillKey = cut(
-      fml$left, 
-      quantile(fml$left, seq(0, 1, 1/ncuts)),
-      ordered_result = TRUE
+  if( eff)
+  {
+    data = transform(data, 
+      fillKey = cut(
+        fml$left, 
+        quantile(c(100,fml$left[which(fml$left!=100)]),seq(0, 1, 1/ncuts)),
+        ordered_result = TRUE
+      )
     )
-  )
+  }
+  else
+  {
+    data = transform(data, 
+      fillKey = cut(
+        fml$left, 
+        quantile(fml$left, seq(0, 1, 1/ncuts)),
+        ordered_result = TRUE
+      )
+    )
+  }
   fillColors = brewer.pal(ncuts, pal)
   d$set(
     scope = map, 
